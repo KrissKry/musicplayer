@@ -1,0 +1,98 @@
+.tabHBox {
+    -fx-background-color: #444444;
+}
+
+.listHBox {
+    -fx-background-color: #ffffff;
+}
+
+.CtrlHBox {
+    -fx-background-color: #444444;
+}
+
+
+.tabButton {
+	-fx-background-color: #333333;
+	-fx-text-fill: #ffffff;
+	-fx-font-family: "Letter Gothic Std";
+	-fx-font-size: 10px;
+	-transition-duration: 0.3s
+}
+
+.tabButton:hover {
+	-fx-background-color: #666666;
+}
+
+.tabNavButton {
+    -fx-background-color: #333333;
+    -fx-text-fill: #ffffff;
+    -fx-font-family: "Letter Gothic Std";
+    -fx-font-size: 11px;
+    -transition-duration: 0.3s;
+    -fx-pref-width: 100px;
+    -fx-pref-height: 35px;
+    -border-radius: 50%;
+}
+
+.tabNavButton:hover {
+	-fx-background-color: #666666;
+}
+
+.tabX {
+    -fx-background-color: #9e0503;
+    -fx-text-fill: #ffffff;
+    -fx-pref-width: 40px;
+    -fx-pref-height: 40px;
+}
+.tabX:hover {
+    -fx-background-color: #e00300;
+}
+
+.tabMinMax {
+    -fx-background-color: #333333;
+    -fx-text-fill: #ffffff;
+    -fx-pref-width: 40px;
+    -fx-pref-height: 40px;
+    -fx-font-size: 11px;
+}
+
+.tabMinMax:hover {
+    -fx-background-color: #666666;
+}
+.tabText {
+    -fx-text-fill: #ffffff;
+    -fx-font-family: "Letter Gothic Std";
+    -fx-font-size: 15px;
+}
+
+.NowPlayingText {
+    -fx-background-color: #333333;
+    -fx-text-fill: #ffffff;
+    -fx-font-family: "Letter Gothic Std";
+    -fx-font-size: 11px;
+    -fx-pref-width: 400px;
+    -fx-pref-height: 40px;
+}
+
+.CtrlPlayButton {
+    -fx-background-color: #999999;
+    -transition-duration: 0.5s;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 25px;
+    -fx-pref-width: 60;
+    -fx-pref-height: 40;
+}
+
+.CtrlPlayButton:hover {
+    -fx-background-color: #bbbbbb;
+}
+
+.CtrlLoadButton {
+}
+
+.CtrlSlider {
+    -fx-pref-width: 400;
+    -fx-pref-height: 20;
+    -fx-background-color:#333333;
+    -fx-control-inner-background: #3bca89;
+}

@@ -6,17 +6,18 @@ import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
-import javafx.scene.input.ContextMenuEvent;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
-import java.util.List;
 
 
 public class Controller {
-    //MusicLister ml = new MusicLister();
+
+    Player player;
     private static Stage primarystage;
     @FXML
     private Button Tracks;
@@ -43,25 +44,60 @@ public class Controller {
     @FXML
     private ListView<String> contentList = new ListView<>();
     @FXML
-    private TextField nowPlaying;
-    private Slider slider;
+    private TextField nowPlaying = new TextField();
+    @FXML
+    private TextField currentTime = new TextField();
+    @FXML
+    private Slider slider = new Slider();
+
+
+    /*    Stores full path to a track: ie "C://Users/... "      */
     ObservableList<String> fullTrackListPath = FXCollections.observableArrayList();
+
+    /*    Stores only track name for display purposes in ListView in app: ie "03. DTKJ "      */
     ObservableList<String> trackList = FXCollections.observableArrayList();
+
+    
 //    ObservableList<String> authorList;
 //    ObservableList<String> albumList;
 //    ObservableList<String> playlistList;
 
     public Controller() {
+        player = new Player();
+        MusicLister.setStage(primarystage);
         System.out.println("Constructed");
     }
 
     @FXML
     private void initialize() {
+
         LoadFiles.setOnAction( e -> handleButtonAction(e) );
         PlayPause.setOnAction( e -> handleButtonAction(e) );
         Next.setOnAction( e -> handleButtonAction(e) );
         Prev.setOnAction( e -> handleButtonAction(e) );
-        System.out.println("Initalized");
+
+        nowPlaying.setEditable(false);
+
+        currentTime.setEditable(false);
+        currentTime.setAlignment(Pos.TOP_RIGHT);
+
+        PlayPause.setPadding(Insets.EMPTY);
+
+        LoadFiles.setPadding(Insets.EMPTY);
+
+        //vertical 3 dots xd
+        Settings.setRotate(90);
+        Settings.setAlignment(Pos.TOP_CENTER);
+        Settings.setPadding(Insets.EMPTY);
+
+        try {
+            player.setCurrentTime(currentTime);
+            player.setSlider(slider);
+        } catch (NullPointerException x) {
+            System.out.println(x.getMessage());
+        }
+
+        System.out.println("Initialized");
     }
 
     @FXML
@@ -71,12 +107,13 @@ public class Controller {
         switch(symbol) {
             case "Load": {
 
-
                 ObservableList<String> newTracksLoaded = MusicLister.getFiles();
+                if (newTracksLoaded != null) {
 
-                for(String newTrack : newTracksLoaded) {
-                    if(!fullTrackListPath.contains(newTrack) )
-                        fullTrackListPath.add(newTrack);
+                    for (String newTrack : newTracksLoaded) {
+                        if (!fullTrackListPath.contains(newTrack))
+                            fullTrackListPath.add(newTrack);
+                    }
                 }
 
                 trackList.clear();
@@ -90,33 +127,34 @@ public class Controller {
             }
             break;
             case "ll": {
-                if ( Player.isPlaying() )
+
+                if( !player.updateMediaplayerStatus(contentList, fullTrackListPath))
                     PlayPause.setText("▶");
-
-                Player.updateMediaplayerStatus(contentList, fullTrackListPath);
-
 
             }
             break;
             case "▶": {
-                if ( !Player.isPlaying() )
+
+                if( player.updateMediaplayerStatus(contentList, fullTrackListPath) ) {
                     PlayPause.setText("ll");
-                Player.updateMediaplayerStatus(contentList, fullTrackListPath);
-                nowPlaying.setText(Player.whatIsPlaying());
+                    nowPlaying.setText(Player.whatIsPlaying());
+                }
             }
             break;
-            case ">>": {
+            case "⏭": {
                 System.out.println("Next Song");
-                Player.nextSong(contentList, fullTrackListPath);
-                PlayPause.setText("ll");
-                nowPlaying.setText(Player.whatIsPlaying());
+                if( player.nextSong(contentList, fullTrackListPath) ) {
+                    PlayPause.setText("ll");
+                    nowPlaying.setText(Player.whatIsPlaying());
+                }
             }
             break;
-            case "<<": {
+            case "⏮": {
                 System.out.println("Prev Song");
-                Player.prevSong(contentList, fullTrackListPath);
-                PlayPause.setText("ll");
-                nowPlaying.setText(Player.whatIsPlaying());
+                if (player.prevSong(contentList, fullTrackListPath)) {
+                    PlayPause.setText("ll");
+                    nowPlaying.setText(Player.whatIsPlaying());
+                }
             }
             break;
             default: {
@@ -143,8 +181,6 @@ public class Controller {
 
             //on click event -> Call Player to add track to queue
             addToQ.setOnAction(event -> {
-                //gets direct
-//                String item = cell.getItem();
                 int trackIndex = cell.getIndex();
                 String newInQueue = fullTrackListPath.get(trackIndex);
                 Player.addToQueue(newInQueue);
@@ -177,6 +213,4 @@ public class Controller {
             return cell;
         });
     }
-
-
 }

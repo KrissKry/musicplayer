@@ -8,48 +8,46 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox prefHeight="600.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="io.github.KrissKry.Controller">
+<VBox prefHeight="600.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="io.github.KrissKry.controller.Controller">
    <children>
-      <HBox prefHeight="100.0" prefWidth="400.0">
+      <HBox minHeight="-Infinity" minWidth="-Infinity" styleClass="tabHBox" stylesheets="@MPlayer_CSS.css">
          <children>
-            <AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="100.0" prefWidth="400.0" styleClass="tabHBox" stylesheets="@MPlayer_CSS.css">
+            <AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="62.0" prefWidth="400.0" stylesheets="@MPlayer_CSS.css">
                <children>
-                  <Button layoutX="200.0" layoutY="66.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" styleClass="tabNavButton" text="Albumy" />
-                  <Button layoutX="278.0" layoutY="14.0" mnemonicParsing="false" styleClass="tabButton" text="Lupka" />
-                  <Button layoutX="332.0" layoutY="14.0" minWidth="28.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="28.0" styleClass="tabButton" text="..." />
-                  <Button layoutY="66.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" styleClass="tabNavButton" text="Utwory" />
-                  <Button layoutX="300.0" layoutY="66.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" styleClass="tabNavButton" text="Playlisty" />
-                  <Button layoutX="100.0" layoutY="66.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" styleClass="tabNavButton" text="Wykonawcy" />
+                  <Button layoutX="0.0" layoutY="45.0" styleClass="tabNavButton" text="Utwory" />
+                  <Button layoutX="100.0" layoutY="45.0" styleClass="tabNavButton" text="Wykonawcy" />
+                  <Button layoutX="200.0" layoutY="45.0" styleClass="tabNavButton" text="Albumy" />
+                  <Button layoutX="300.0" layoutY="45.0" styleClass="tabNavButton" text="Playlisty" />
+                  <Button fx:id="Search" layoutX="284.0" layoutY="10.0" mnemonicParsing="false" styleClass="tabButton" text="Lupka" />
+                  <Button fx:id="Settings" layoutX="350.0" layoutY="5.0" styleClass="tabSettings" text="..." />
                </children>
             </AnchorPane>
          </children>
       </HBox>
-      <HBox prefHeight="400.0" prefWidth="400.0">
+      <HBox minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="400.0" styleClass="listHBox" stylesheets="@MPlayer_CSS.css">
          <children>
             <ListView fx:id="contentList" prefHeight="400.0" prefWidth="400.0" />
          </children>
       </HBox>
-      <HBox prefHeight="40.0" prefWidth="400.0">
+      <HBox prefHeight="100.0" prefWidth="400.0" styleClass="CtrlHBox" stylesheets="@MPlayer_CSS.css">
          <children>
             <AnchorPane prefHeight="200.0" prefWidth="200.0">
                <children>
                   <TextField fx:id="nowPlaying" styleClass="NowPlayingText" stylesheets="@MPlayer_CSS.css" />
-                  <Slider layoutY="-12.0" prefHeight="24.0" prefWidth="400.0" />
+                  <TextField fx:id="currentTime" layoutX="320.0" layoutY="5.0" styleClass="CurrentMusicTimeText" stylesheets="@MPlayer_CSS.css" />
+                  <Slider fx:id="slider" layoutY="-5.0" styleClass="CtrlSlider" stylesheets="@MPlayer_CSS.css" />
+                  <AnchorPane layoutY="40.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="60.0" prefWidth="400.0" styleClass="CtrlHBox" stylesheets="@MPlayer_CSS.css">
+                     <children>
+                        <Button fx:id="PlayPause" alignment="CENTER" layoutX="180.0" layoutY="0.0" styleClass="CtrlPlayButton" stylesheets="@MPlayer_CSS.css" text="▶" />
+                        <Button fx:id="Next" layoutX="235.0" layoutY="0.0" styleClass="CtrlNextPrevButton" stylesheets="@MPlayer_CSS.css" text="⏭" />
+                        <Button fx:id="Prev" layoutX="115.0" layoutY="0.0" styleClass="CtrlNextPrevButton" stylesheets="@MPlayer_CSS.css" text="⏮" />
+                        <Button fx:id="Queue" layoutX="330.0" layoutY="10.0" styleClass="tabButton" stylesheets="@MPlayer_CSS.css" text="|||" />
+                        <Button fx:id="LoadFiles" layoutX="20.0" layoutY="10.0" mnemonicParsing="false" styleClass="CtrlLoadButton" text="Load" />
+
+                     </children>
+                  </AnchorPane>
                </children>
             </AnchorPane>
          </children></HBox>
-      <HBox prefHeight="60.0" prefWidth="400.0">
-         <children>
-            <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="60.0" prefWidth="400.0" styleClass="CtrlHBox" stylesheets="@MPlayer_CSS.css">
-               <children>
-                  <Button fx:id="PlayPause" alignment="CENTER" layoutX="170.0" layoutY="10.0" mnemonicParsing="false" prefHeight="37.0" prefWidth="95.0" styleClass="CtrlPlayButton" stylesheets="@MPlayer_CSS.css" text="▶" />
-                  <Button fx:id="Next" layoutX="241.0" layoutY="12.0" minWidth="45.0" mnemonicParsing="false" prefHeight="37.0" prefWidth="45.0" styleClass="tabButton" stylesheets="@MPlayer_CSS.css" text="&gt;&gt;" />
-                  <Button fx:id="Queue" layoutX="332.0" layoutY="12.0" minWidth="45.0" mnemonicParsing="false" prefHeight="37.0" prefWidth="45.0" styleClass="tabButton" stylesheets="@MPlayer_CSS.css" text="|||" />
-                  <Button fx:id="LoadFiles" layoutX="14.0" layoutY="10.0" minHeight="37.0" minWidth="45.0" mnemonicParsing="false" prefHeight="37.0" prefWidth="67.0" styleClass="tabMinMax" text="Load" />
-                  <Button fx:id="Prev" layoutX="106.0" layoutY="12.0" minWidth="45.0" mnemonicParsing="false" prefHeight="37.0" prefWidth="45.0" styleClass="tabButton" stylesheets="@MPlayer_CSS.css" text="&lt;&lt;" />
-               </children>
-            </AnchorPane>
-         </children>
-      </HBox>
    </children>
 </VBox>

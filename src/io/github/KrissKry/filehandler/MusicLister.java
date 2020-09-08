@@ -13,7 +13,7 @@ import java.util.List;
 public class MusicLister {
     private static Stage primaryStage;
 
-    public static void main(String args[]) throws IOException {
+    public static void main(String args[]) {
     }
 
     public static ObservableList<String> getFiles() throws NullPointerException {
@@ -22,7 +22,7 @@ public class MusicLister {
 
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("All Files", "*.*"),
-                new FileChooser.ExtensionFilter("Music Files", "*.mp3"));
+                new FileChooser.ExtensionFilter("Music Files", "*.mp3", "*.m4a", "*.wma") );
 
         fileChooser.setTitle("Select music files");
         fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
@@ -31,14 +31,20 @@ public class MusicLister {
         try {
             ObservableList<String> list = FXCollections.observableArrayList();
 
+            //add all files read to list
             for(File f : selectedFiles)
-                list.add(f.toString());
+                list.add( f.toString() );
 
-            list.removeIf( element -> !element.contains(".mp3"));
+            //filter all non-audio files from the list
+            list.removeIf( element -> ( !element.contains(".mp3") && !element.contains(".m4a") && !element.contains(".wma") ));
+
+            //create a sorted list from audio files
             SortedList<String> sortedTrackList = new SortedList<>(list);
             return sortedTrackList;
+
         } catch (NullPointerException x) {
-            System.out.println(x.getLocalizedMessage());
+            // No files were read, can't create a list of strings from null
+            System.out.println(x.getLocalizedMessage() + "at creating sorted list of new tracks.");
         }
         return null;
     }

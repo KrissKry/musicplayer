@@ -90,6 +90,7 @@ public class Controller {
         try {
             player.setCurrentTime(currentTime);
             player.setSlider(slider);
+            player.setNowPlaying(nowPlaying);
         } catch (NullPointerException x) {
             System.out.println(x.getMessage());
         }
@@ -124,42 +125,35 @@ public class Controller {
             }
             break;
             case "ll": {
-
-                if( !player.updateMediaPlayerStatus( fullTrackListPath, contentList.getSelectionModel().getSelectedIndex() ))
+                int index = contentList.getSelectionModel().getSelectedIndex();
+                if( !player.updateMediaPlayerStatus( fullTrackListPath, index ))
                     PlayPause.setText("▶");
 
             }
             break;
             case "▶": {
-
-                if( player.updateMediaPlayerStatus( fullTrackListPath, contentList.getSelectionModel().getSelectedIndex() ) ) {
+                int index = contentList.getSelectionModel().getSelectedIndex();
+                if( player.updateMediaPlayerStatus( fullTrackListPath, index ) ) {
                     PlayPause.setText("ll");
                     nowPlaying.setText(Player.whatIsPlaying());
                 }
             }
             break;
             case "⏭": {
-                //System.out.println("Next Song");
-                //if( player.nextSong(contentList, fullTrackListPath) ) {
                 if ( player.nextSong(fullTrackListPath) ) {
 
-
                     PlayPause.setText("ll");
-                    nowPlaying.setText(Player.whatIsPlaying());
                     contentList.getSelectionModel().select( player.getCurrentlyChosenTrack() );
+
                 } else {
                     PlayPause.setText("▶");
                 }
             }
             break;
             case "⏮": {
-                //System.out.println("Prev Song");
-                //if (player.prevSong(contentList, fullTrackListPath)) {
                 if ( player.prevSong(fullTrackListPath) ) {
 
-
                     PlayPause.setText("ll");
-                    nowPlaying.setText(Player.whatIsPlaying());
                     contentList.getSelectionModel().select( player.getCurrentlyChosenTrack() );
                 }
             }

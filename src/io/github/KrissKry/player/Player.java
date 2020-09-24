@@ -15,7 +15,7 @@ public class Player {
 
     private TextField currentTime;
     private Slider slider;
-
+    private TextField nowPlaying;
     private int trackChosenBeforeQ;
     //private int trackChosenFromQ;
     private int currentlyChosenTrack;
@@ -40,13 +40,15 @@ public class Player {
     public boolean updateMediaPlayerStatus(ObservableList<String> fullTrackListPath, int index) {
 
         //no tracks
+
         if (fullTrackListPath == null || fullTrackListPath.size() <= 0)
             return false;
+
 
         //no track playing rn / missing first run
 //        if ( track == null || track.equals("") )
 //            return false;
-
+//        System.out.println("playing: " + track);
         //if mediaplayer has not been used before or is in unknown status, load new track
         if ( mediaplayer == null || mediaplayer.getStatus().equals(MediaPlayer.Status.UNKNOWN) || mediaplayer.getStatus().equals(MediaPlayer.Status.STOPPED) ) {
 
@@ -67,8 +69,14 @@ public class Player {
         } else if ( mediaplayer.getStatus().equals(MediaPlayer.Status.PAUSED) ) {
 
 
+            //when in queue, regular indexing won't work
+            if ( queue.getVisible() ) {
+                mediaplayer.play();
+                return true;
+            }
+
             //still on the same track selected, resume playing
-            if ( new File( track ).toURI().toString() == mediaplayer.getMedia().getSource()) {
+            if ( new File( fullTrackListPath.get(index) ).toURI().toString().equals( mediaplayer.getMedia().getSource() )) {
                 mediaplayer.play();
 
 
@@ -119,14 +127,27 @@ public class Player {
             } else {
                 track = fullTrackListPath.get(trackChosenBeforeQ);
                 currentlyChosenTrack = trackChosenBeforeQ;
+                try {
+                    mediaplayer.pause();
+                } catch (NullPointerException x) {
+                    System.out.println("Media player wasn't playing");
+
+                }
                 //loadTrack(track);
             }
 
         //there are tracks in queue
         } else {
+            //System.out.println("track prev " + track);
             track = queue.getNextFromQueue();
-
+            //System.out.println("track post " + track);
             currentlyChosenTrack = fullTrackListPath.indexOf(track);
+            try {
+                mediaplayer.pause();
+            } catch (NullPointerException x) {
+                System.out.println("Media player wasn't playing");
+
+            }
             //currentlyChosenTrack = trackChosenFromQ;
         }
 
@@ -185,6 +206,7 @@ public class Player {
             duration = Double.toString( mediaplayer.getTotalDuration().toSeconds() );
             duration = duration.substring(0, duration.indexOf('.'));
             updateSlider();
+            updateNowPlaying();
             mediaplayer.play();
         });
 
@@ -197,14 +219,16 @@ public class Player {
             currentTime.setText(progress);
 
         });
+
         mediaplayer.setOnEndOfMedia(() -> {
             slider.setValue(0);
             nextSong(fullTrackListPath);
-//            automaticNextSong(fullTrackL);
         });
     }
 
-    public static String whatIsPlaying() { return songTitle(track); }
+    public static String whatIsPlaying() {
+        //System.out.println("now playing: " + track);
+        return songTitle(track); }
 
 
     public static String songTitle(String trackFullPath) {
@@ -215,10 +239,6 @@ public class Player {
             return null;
         }
     }
-
-    /*public void setNowPlaying(TextField nowPlaying) {
-        this.nowPlaying = nowPlaying;
-    }*/
 
     public void setSlider(Slider slider) {
         this.slider = slider;
@@ -233,6 +253,7 @@ public class Player {
         slider.setValue(0);
         slider.setMax(mediaplayer.getTotalDuration().toSeconds());
     }
+
 
     private void sliderSetup() {
         slider.setMin(0);
@@ -250,17 +271,12 @@ public class Player {
 
     public Queue getQueue() { return queue; }
 
-//    public void setTrackChosenBeforeQ(int index) {
-//        trackChosenBeforeQ = index;
-//    }
-//
-//    public void setTrackChosenFromQ(int index) {
-//        trackChosenFromQ = index;
-//    }
-
-//    public int getTrackChosenBeforeQ() { return trackChosenBeforeQ; }
-
     public int getCurrentlyChosenTrack() { return currentlyChosenTrack; }
 
-//    public int getTrackChosenFromQ() { return  trackChosenFromQ; }
+    public void setNowPlaying(TextField nowPlaying) {
+        this.nowPlaying = nowPlaying;
+    }
+    private void updateNowPlaying() {
+        nowPlaying.setText( whatIsPlaying() );
+    }
 }

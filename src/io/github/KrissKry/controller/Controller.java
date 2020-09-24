@@ -10,7 +10,6 @@ import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
-import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
 
@@ -19,6 +18,7 @@ public class Controller {
 
     Player player;
     private static Stage primarystage;
+
     @FXML
     private Button Tracks;
     @FXML
@@ -57,10 +57,6 @@ public class Controller {
     /*    Stores only track name for display purposes in ListView in app: ie "03. DTKJ "      */
     ObservableList<String> trackList = FXCollections.observableArrayList();
 
-    
-//    ObservableList<String> authorList;
-//    ObservableList<String> albumList;
-//    ObservableList<String> playlistList;
 
     public Controller() {
         player = new Player();
@@ -75,6 +71,7 @@ public class Controller {
         PlayPause.setOnAction( e -> handleButtonAction(e) );
         Next.setOnAction( e -> handleButtonAction(e) );
         Prev.setOnAction( e -> handleButtonAction(e) );
+        Queue.setOnAction( e -> queuePopup(e) );
 
         nowPlaying.setEditable(false);
 
@@ -165,6 +162,20 @@ public class Controller {
         }
     }
 
+    @FXML
+    private void queuePopup(ActionEvent e) {
+        //if is not visible -> we want to open the queue
+        if ( !player.getQueue().getVisible() ) {
+            player.getQueue().setVisible(true);
+            contentList.getItems().clear();
+            contentList.getItems().addAll( player.getQueue().getQueuedTracksName() );
+        } else {
+            player.getQueue().setVisible(false);
+            contentList.getItems().clear();
+            contentList.getItems().addAll( trackList );
+        }
+
+    }
     //no clue tf it's doing but it does it's job fucking perfectly
     private void updateContext() {
         contentList.setCellFactory(lv -> {
@@ -181,10 +192,10 @@ public class Controller {
 
             //on click event -> Call Player to add track to queue
             addToQ.setOnAction(event -> {
-                int trackIndex = cell.getIndex();
-                String newInQueue = fullTrackListPath.get(trackIndex);
-                Player.addToQueue(newInQueue);
 
+                int trackIndex = cell.getIndex();
+                String queueTrackPath = fullTrackListPath.get(trackIndex);
+                player.getQueue().addToQueue(queueTrackPath);
             });
 
             //new Menu Item to delete from tracklist

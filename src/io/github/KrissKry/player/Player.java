@@ -15,10 +15,11 @@ import javafx.util.Duration;
 import java.io.File;
 
 public class Player {
-    private static ListView<String> queue = new ListView<>();
+    //private static ListView<String> queue = new ListView<>();
 
     private TextField currentTime;
     private Slider slider;
+    private int trackChosen;
 
     private static String progress = "";
     private static String duration = "";
@@ -28,7 +29,14 @@ public class Player {
 
     private static String track = "";
 
-    public Player() {}
+    Queue queue;
+
+
+    public Player() {
+        queue = new Queue();
+    }
+
+
 
     // play/pause button has been pressed
     public boolean updateMediaplayerStatus(ListView<String> appMusicList, ObservableList<String> fullTrackListPath) throws NullPointerException {
@@ -38,7 +46,6 @@ public class Player {
             return false;
 
         //no track chosen
-        //ewentualnie dodac ze jak cos gra to zatrzxymac??
         if (appMusicList.getSelectionModel().getSelectedItem() == null)
             return false;
 
@@ -76,14 +83,16 @@ public class Player {
         return false;
     }
 
+
+
     public boolean nextSong(ListView<String> appMusicList, ObservableList<String> fullTrackListPath) {
 
         if (appMusicList.getItems().size() == 0 || fullTrackListPath.size() == 0)
             return false;
 
         //empty queue
-        if ( queue.getItems().size() == 0 ) {
 
+        if ( !queue.hasTracksInQueue() ) {
             //get currently selected track
             int index = appMusicList.getSelectionModel().getSelectedIndex();
 
@@ -108,6 +117,7 @@ public class Player {
             return true;
             //tracks in queue, play next from queue
         } else {
+            System.out.println("not null from q");
             try {
                 mediaplayer.pause();
             } catch (NullPointerException x) {
@@ -115,19 +125,26 @@ public class Player {
             }
 
             //get next track from queue
-            track = queue.getItems().get(0);
+            track = queue.getNextFromQueue();
+            System.out.println("got track " + track);
 
             //select track in app tracklist
             appMusicList.getSelectionModel().select( songTitle(track) );
-
-            //remove track from queue (as its playing)
-            queue.getItems().remove(0);
+            try {
+//                trackChosen = trackList.indexOf(track);
+            } catch (NullPointerException x) {
+                System.out.println("Song removed before playing from q");
+            }
 
             //turn on media
             loadTrack(appMusicList, fullTrackListPath);
+
             return true;
         }
     }
+
+
+
 
     public boolean prevSong(ListView<String> appMusicList, ObservableList<String> fullTrackListPath) {
 
@@ -164,7 +181,8 @@ public class Player {
 
 
         int trackIndex = appMusicList.getSelectionModel().getSelectedIndex();
-        System.out.println("Loading track " + trackIndex);
+//        System.out.println("Loading track " + trackChosen);
+
         trackMedia = new Media( new File( fullTrackListPath.get(trackIndex) ).toURI().toString());
 
         mediaplayer = new MediaPlayer(trackMedia);
@@ -195,13 +213,20 @@ public class Player {
     }
 
     public static String whatIsPlaying() { return songTitle(track); }
+//
+//    public static void addToQueue(String track) {
+//        queue.getItems().add(track);
+//        System.out.println(track);
+//    }
 
-    public static void addToQueue(String track) {
-        queue.getItems().add(track);
-        System.out.println(track);
+    public static String songTitle(String trackFullPath) {
+        try {
+            return trackFullPath.substring(trackFullPath.lastIndexOf("\\") + 1 );
+        } catch (NullPointerException x) {
+            System.out.println("fked song title: " + trackFullPath);
+            return null;
+        }
     }
-
-    public static String songTitle(String trackFullPath) { return trackFullPath.substring(trackFullPath.lastIndexOf("\\") + 1 ); }
 
     /*public void setNowPlaying(TextField nowPlaying) {
         this.nowPlaying = nowPlaying;
@@ -235,4 +260,5 @@ public class Player {
         });
     }
 
+    public Queue getQueue() { return queue; }
 }

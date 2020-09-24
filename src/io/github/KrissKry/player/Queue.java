@@ -6,8 +6,6 @@ import java.util.List;
 public class Queue {
 
     private boolean visible = false;
-    //private ObservableList<String> queuedTracksName = FXCollections.observableArrayList();
-    //private ObservableList<String> queuedTracksPath = FXCollections.observableArrayList();
     private List<String> queuedTracksName = new ArrayList<>();
     private List<String> queuedTracksPath = new ArrayList<>();
     public Queue() {}
@@ -20,7 +18,6 @@ public class Queue {
 
     public String getNextFromQueue() {
         try {
-//            String temp = queue.getItems().get(0);
             String temp = queuedTracksPath.get(0);
             queuedTracksName.remove(0);
             queuedTracksPath.remove(0);

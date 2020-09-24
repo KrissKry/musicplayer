@@ -125,32 +125,42 @@ public class Controller {
             break;
             case "ll": {
 
-                if( !player.updateMediaplayerStatus(contentList, fullTrackListPath))
+                if( !player.updateMediaPlayerStatus( fullTrackListPath, contentList.getSelectionModel().getSelectedIndex() ))
                     PlayPause.setText("▶");
 
             }
             break;
             case "▶": {
 
-                if( player.updateMediaplayerStatus(contentList, fullTrackListPath) ) {
+                if( player.updateMediaPlayerStatus( fullTrackListPath, contentList.getSelectionModel().getSelectedIndex() ) ) {
                     PlayPause.setText("ll");
                     nowPlaying.setText(Player.whatIsPlaying());
                 }
             }
             break;
             case "⏭": {
-                System.out.println("Next Song");
-                if( player.nextSong(contentList, fullTrackListPath) ) {
+                //System.out.println("Next Song");
+                //if( player.nextSong(contentList, fullTrackListPath) ) {
+                if ( player.nextSong(fullTrackListPath) ) {
+
+
                     PlayPause.setText("ll");
                     nowPlaying.setText(Player.whatIsPlaying());
+                    contentList.getSelectionModel().select( player.getCurrentlyChosenTrack() );
+                } else {
+                    PlayPause.setText("▶");
                 }
             }
             break;
             case "⏮": {
-                System.out.println("Prev Song");
-                if (player.prevSong(contentList, fullTrackListPath)) {
+                //System.out.println("Prev Song");
+                //if (player.prevSong(contentList, fullTrackListPath)) {
+                if ( player.prevSong(fullTrackListPath) ) {
+
+
                     PlayPause.setText("ll");
                     nowPlaying.setText(Player.whatIsPlaying());
+                    contentList.getSelectionModel().select( player.getCurrentlyChosenTrack() );
                 }
             }
             break;
@@ -166,6 +176,7 @@ public class Controller {
     private void queuePopup(ActionEvent e) {
         //if is not visible -> we want to open the queue
         if ( !player.getQueue().getVisible() ) {
+
             player.getQueue().setVisible(true);
             contentList.getItems().clear();
             contentList.getItems().addAll( player.getQueue().getQueuedTracksName() );
@@ -173,6 +184,7 @@ public class Controller {
             player.getQueue().setVisible(false);
             contentList.getItems().clear();
             contentList.getItems().addAll( trackList );
+            contentList.getSelectionModel().select( player.getCurrentlyChosenTrack() );
         }
 
     }

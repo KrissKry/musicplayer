@@ -1,13 +1,9 @@
 package io.github.KrissKry.player;
 
-import io.github.KrissKry.controller.Controller;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
@@ -15,10 +11,14 @@ import javafx.util.Duration;
 import java.io.File;
 
 public class Player {
-    private static ListView<String> queue = new ListView<>();
+    //private static ListView<String> queue = new ListView<>();
 
     private TextField currentTime;
     private Slider slider;
+    private TextField nowPlaying;
+    private int trackChosenBeforeQ;
+    //private int trackChosenFromQ;
+    private int currentlyChosenTrack;
 
     private static String progress = "";
     private static String duration = "";
@@ -28,123 +28,152 @@ public class Player {
 
     private static String track = "";
 
-    public Player() {}
+    Queue queue;
 
-    // play/pause button has been pressed
-    public boolean updateMediaplayerStatus(ListView<String> appMusicList, ObservableList<String> fullTrackListPath) throws NullPointerException {
 
-        //no tracks loaded
-        if (appMusicList.getItems().size() == 0)
+    public Player() {
+        queue = new Queue();
+    }
+
+
+
+    public boolean updateMediaPlayerStatus(ObservableList<String> fullTrackListPath, int index) {
+
+        //no tracks
+
+        if (fullTrackListPath == null || fullTrackListPath.size() <= 0)
             return false;
 
-        //no track chosen
-        //ewentualnie dodac ze jak cos gra to zatrzxymac??
-        if (appMusicList.getSelectionModel().getSelectedItem() == null)
-            return false;
 
-
+        //no track playing rn / missing first run
+//        if ( track == null || track.equals("") )
+//            return false;
+//        System.out.println("playing: " + track);
         //if mediaplayer has not been used before or is in unknown status, load new track
         if ( mediaplayer == null || mediaplayer.getStatus().equals(MediaPlayer.Status.UNKNOWN) || mediaplayer.getStatus().equals(MediaPlayer.Status.STOPPED) ) {
 
-            track = appMusicList.getSelectionModel().getSelectedItem();
-            loadTrack(appMusicList, fullTrackListPath);
+            track = fullTrackListPath.get(index);
+            trackChosenBeforeQ = index;
+            currentlyChosenTrack = index;
+            loadTrack(fullTrackListPath, track);
             return true;
 
-        //if music is playing
+            //if music is playing
         } else if ( mediaplayer.getStatus().equals(MediaPlayer.Status.PLAYING) ) {
-                mediaplayer.pause();
-                return false;
 
-        //if music is paused
+            mediaplayer.pause();
+            return false;
+
+
+            //if music is paused
         } else if ( mediaplayer.getStatus().equals(MediaPlayer.Status.PAUSED) ) {
 
-            //still on the same track selected, resume playing
-            if ( appMusicList.getSelectionModel().getSelectedItem().equals(track) ) {
 
+            //when in queue, regular indexing won't work
+            if ( queue.getVisible() ) {
+                mediaplayer.play();
+                return true;
+            }
+
+            //still on the same track selected, resume playing
+            if ( new File( fullTrackListPath.get(index) ).toURI().toString().equals( mediaplayer.getMedia().getSource() )) {
                 mediaplayer.play();
 
 
-            //different song selected, new MediaPlayer, resume playing
+                //different song selected, new MediaPlayer, resume playing
             } else {
 
-                track = appMusicList.getSelectionModel().getSelectedItem();
-                loadTrack(appMusicList, fullTrackListPath);
-
+                track = fullTrackListPath.get(index);
+                currentlyChosenTrack = index;
+                trackChosenBeforeQ = index;
+                loadTrack(fullTrackListPath, track);
             }
             return true;
         }
+
         return false;
     }
 
-    public boolean nextSong(ListView<String> appMusicList, ObservableList<String> fullTrackListPath) {
 
-        if (appMusicList.getItems().size() == 0 || fullTrackListPath.size() == 0)
+
+    public boolean nextSong(ObservableList<String> fullTrackListPath) {
+
+        //no tracks overall
+        if (fullTrackListPath == null || fullTrackListPath.size() == 0)
             return false;
 
-        //empty queue
-        if ( queue.getItems().size() == 0 ) {
+        //no tracks in queue
+        if ( !queue.hasTracksInQueue() ) {
 
-            //get currently selected track
-            int index = appMusicList.getSelectionModel().getSelectedIndex();
+            //move to next track
+            trackChosenBeforeQ++;
 
-            //go to beginning if at the end of tracklist
-            if (index == (appMusicList.getItems().size() - 1))
-                index = 0;
-            else
-                index++;
 
-            //select new(next) track
-            appMusicList.getSelectionModel().select(index);
+            //reached end of tracklist, pause music, reset index
+            if (trackChosenBeforeQ >= fullTrackListPath.size() ) {
 
-            try {
-                mediaplayer.pause();
-            } catch (NullPointerException x) {
-                System.out.println(x.getMessage());
+                trackChosenBeforeQ = 0;
+                currentlyChosenTrack = trackChosenBeforeQ;
+                try {
+                    mediaplayer.pause();
+                } catch (NullPointerException x) {
+                    System.out.println("Media player wasn't playing");
+
+                }
+                return false;
+
+
+            //next track available theoretically
+            } else {
+                track = fullTrackListPath.get(trackChosenBeforeQ);
+                currentlyChosenTrack = trackChosenBeforeQ;
+                try {
+                    mediaplayer.pause();
+                } catch (NullPointerException x) {
+                    System.out.println("Media player wasn't playing");
+
+                }
+                //loadTrack(track);
             }
 
-            //load track
-            track = appMusicList.getItems().get(index);
-            loadTrack(appMusicList, fullTrackListPath);
-            return true;
-            //tracks in queue, play next from queue
+        //there are tracks in queue
         } else {
+            //System.out.println("track prev " + track);
+            track = queue.getNextFromQueue();
+            //System.out.println("track post " + track);
+            currentlyChosenTrack = fullTrackListPath.indexOf(track);
             try {
                 mediaplayer.pause();
             } catch (NullPointerException x) {
-                System.out.println(x.getMessage());
+                System.out.println("Media player wasn't playing");
+
             }
-
-            //get next track from queue
-            track = queue.getItems().get(0);
-
-            //select track in app tracklist
-            appMusicList.getSelectionModel().select( songTitle(track) );
-
-            //remove track from queue (as its playing)
-            queue.getItems().remove(0);
-
-            //turn on media
-            loadTrack(appMusicList, fullTrackListPath);
-            return true;
+            //currentlyChosenTrack = trackChosenFromQ;
         }
+
+        try {
+            loadTrack(fullTrackListPath, track);
+            return true;
+        } catch (Exception x) {
+            System.out.println("Exception on loading track " + x.getMessage());
+            return false;
+        }
+
+//        return false;
     }
 
-    public boolean prevSong(ListView<String> appMusicList, ObservableList<String> fullTrackListPath) {
 
-        if (appMusicList.getItems().size() == 0 || fullTrackListPath.size() == 0)
+
+
+    public boolean prevSong(ObservableList<String> fullTrackListPath) {
+
+        if ( fullTrackListPath == null || fullTrackListPath.size() == 0)
             return false;
 
-        //check if index in boundaries
-        int index = appMusicList.getSelectionModel().getSelectedIndex();
+        if (trackChosenBeforeQ > 0)
+            trackChosenBeforeQ--;
 
-        //keep index in boundaries
-        if (index != 0)
-            index--;
-
-
-        //select prev track
-        appMusicList.getSelectionModel().select(index);
-
+        currentlyChosenTrack = trackChosenBeforeQ;
 
         try {
             //if sth is playing catch exception if mediaplayer not yet created
@@ -153,19 +182,22 @@ public class Player {
             System.out.println(x.getMessage());
         }
 
+        track = fullTrackListPath.get(trackChosenBeforeQ);
 
-        //update track String, load track in app
-        track = appMusicList.getItems().get(index);
-        loadTrack(appMusicList, fullTrackListPath);
-        return true;
+
+        try {
+            loadTrack(fullTrackListPath, track);
+            return true;
+        } catch (Exception x) {
+            return false;
+        }
     }
 
-    public void loadTrack(ListView<String> appMusicList, ObservableList<String> fullTrackListPath) {
 
 
-        int trackIndex = appMusicList.getSelectionModel().getSelectedIndex();
-        System.out.println("Loading track " + trackIndex);
-        trackMedia = new Media( new File( fullTrackListPath.get(trackIndex) ).toURI().toString());
+    public void loadTrack(ObservableList<String> fullTrackListPath, String track) {
+
+        trackMedia = new Media( new File( track ).toURI().toString());
 
         mediaplayer = new MediaPlayer(trackMedia);
 
@@ -174,8 +206,8 @@ public class Player {
             duration = Double.toString( mediaplayer.getTotalDuration().toSeconds() );
             duration = duration.substring(0, duration.indexOf('.'));
             updateSlider();
+            updateNowPlaying();
             mediaplayer.play();
-//            System.out.println("Now Playing!");
         });
 
         mediaplayer.currentTimeProperty().addListener((observable, oldValue, newValue) -> {
@@ -185,27 +217,28 @@ public class Player {
             temp = temp.substring(0, temp.indexOf('.'));
             progress = temp + "s/" + duration + "s";
             currentTime.setText(progress);
+
         });
 
         mediaplayer.setOnEndOfMedia(() -> {
             slider.setValue(0);
-            nextSong(appMusicList, fullTrackListPath);
+            nextSong(fullTrackListPath);
         });
-
     }
 
-    public static String whatIsPlaying() { return songTitle(track); }
+    public static String whatIsPlaying() {
+        //System.out.println("now playing: " + track);
+        return songTitle(track); }
 
-    public static void addToQueue(String track) {
-        queue.getItems().add(track);
-        System.out.println(track);
+
+    public static String songTitle(String trackFullPath) {
+        try {
+            return trackFullPath.substring(trackFullPath.lastIndexOf("\\") + 1 );
+        } catch (NullPointerException x) {
+            System.out.println("fked song title: " + trackFullPath);
+            return null;
+        }
     }
-
-    public static String songTitle(String trackFullPath) { return trackFullPath.substring(trackFullPath.lastIndexOf("\\") + 1 ); }
-
-    /*public void setNowPlaying(TextField nowPlaying) {
-        this.nowPlaying = nowPlaying;
-    }*/
 
     public void setSlider(Slider slider) {
         this.slider = slider;
@@ -221,6 +254,7 @@ public class Player {
         slider.setMax(mediaplayer.getTotalDuration().toSeconds());
     }
 
+
     private void sliderSetup() {
         slider.setMin(0);
 
@@ -235,4 +269,14 @@ public class Player {
         });
     }
 
+    public Queue getQueue() { return queue; }
+
+    public int getCurrentlyChosenTrack() { return currentlyChosenTrack; }
+
+    public void setNowPlaying(TextField nowPlaying) {
+        this.nowPlaying = nowPlaying;
+    }
+    private void updateNowPlaying() {
+        nowPlaying.setText( whatIsPlaying() );
+    }
 }

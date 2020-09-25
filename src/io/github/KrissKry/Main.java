@@ -1,5 +1,6 @@
 package io.github.KrissKry;
 
+import io.github.KrissKry.filehandler.MusicLister;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -14,10 +15,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
 
-        MusicLister.setStage(primaryStage);
         Parent root = FXMLLoader.load(getClass().getResource("MPlayer_UI.fxml"));
-        //FXMLLoader uiLoader = new FXMLLoader();
-        //uiLoader.setLocation(this.getClass().getResource("MPlayer_UI.fxml"));
         Scene scene = new Scene(root);
 
 //        primaryStage.initStyle(StageStyle.TRANSPARENT);
